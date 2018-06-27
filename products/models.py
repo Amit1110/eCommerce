@@ -2,6 +2,9 @@ from django.db import models
 import random
 import os
 # Create your models here.
+from django.db.models.signals import pre_save
+from .utils import unique_slug_generator
+
 
 def get_file_ext(filepath):
 	base_name = os.path.basename(filepath)
@@ -26,7 +29,6 @@ class ProductManger(models.Manager):
 		if qs.count() == 1:
 			return qs.first()
 		return None
-		
 
 
 class Product(models.Model):
@@ -40,9 +42,19 @@ class Product(models.Model):
 
 	objects = ProductManger()
 
+	def get_absolute_url(self):
+		return "/products/{slug}".format(slug = self.slug)
+
 	def __str__(self):
 		return self.title
 
 	def __unicode__(self):
 		return self.title
+
+
+def product_pre_save_receiver(sender, instance , *args, **kwargs):
+	if not instance.slug:
+		instance.slug = unique_slug_generator(instance)
+
+pre_save.connect(product_pre_save_receiver,sender = Product)
 		

@@ -1,6 +1,7 @@
 from django.db import models
 import random
 import os
+from django.urls import reverse
 # Create your models here.
 from django.db.models.signals import pre_save
 from .utils import unique_slug_generator
@@ -38,12 +39,13 @@ class Product(models.Model):
 	price = models.DecimalField(decimal_places = 2,max_digits = 20,default = 39.99)
 	image = models.ImageField(upload_to=upload_image_path,null=True,blank =True)#slash upront causes issues
 	featured = models.BooleanField(default=False)
-
+	timestamp = models.DateTimeField(auto_now_add = True)
 
 	objects = ProductManger()
 
 	def get_absolute_url(self):
-		return "/products/{slug}".format(slug = self.slug)
+		#return "/products/{slug}".format(slug = self.slug)
+		return reverse("products:detail",kwargs={"slug":self.slug})
 
 	def __str__(self):
 		return self.title

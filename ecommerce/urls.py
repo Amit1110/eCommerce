@@ -2,6 +2,8 @@ from django.conf.urls import url,include
 from django.contrib import admin
 from django.conf import settings
 from django.conf.urls.static import static
+from django.views.generic import TemplateView
+
 # from products.views import (ProductListView, productlistview,ProductDetailView, productdetailview,
 #     ProductFeaturedListView,ProductFeaturedDetailView,ProductDetailSlugView)
 
@@ -13,8 +15,10 @@ urlpatterns = [
     url(r'^about/$', about_page,name='about'),
     url(r'^contact/$', contact_page,name='contact'),
     url(r'^login/$', login_page,name='login'),
-     url(r'^products/', include("products.urls",namespace = 'products')),
+    url(r'^products/', include("products.urls",namespace = 'products')),
     url(r'^register/$', register_page,name='register'),
+    url(r'^bootstrap/$', TemplateView.as_view(template_name = 'bootstrap/example.html')),
+    url(r'^search/', include("search.urls",namespace = 'search')),   
     # url(r'^product-fbv/$', productlistview),
     # url(r'^featured/$', ProductFeaturedListView.as_view()),
     # url(r'^featured/(?P<pk>\d+)/$', ProductFeaturedDetailView.as_view()),

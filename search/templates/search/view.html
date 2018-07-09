@@ -4,16 +4,18 @@
 {%block content %}
 
 <div class="row mb-3">
-	{% if request.GET.q %}
+	{% if query %}
 		<div class="col-12 " >
-			Searched for <b>{{ request.GET.q }}</b>
+			Searched for <b>{{ query }}</b>
 			<hr/> 
 		</div>
 		{% else %}
-		<div class="col-12 col-md-6 mx-auto">
-			<input class="form-control" type="text" placeholder="Search">	
+		<div class="col-12 col-md-6 mx-auto py-5">
+			{% include 'search/snippets/search-form.html' %}	
 			</div>	
-
+		<div class="col-12">
+			<hr/>	
+		</div>
 		{% endif %}
 </div>
 

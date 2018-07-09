@@ -4,6 +4,7 @@ from django.contrib.auth import authenticate,login,get_user_model
 from .forms import ContactForm,LoginForm,RegisterForm
 
 def home_page(request):
+	#print(request.session.get("first_name", "Unknown")) #sec value default
 	context ={
 	"title":"Hello World",
 	'content': 'Welcome to page',

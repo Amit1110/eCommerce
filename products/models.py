@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Q
 import random
 import os
 from django.urls import reverse
@@ -30,6 +31,13 @@ class ProductManger(models.Manager):
 		if qs.count() == 1:
 			return qs.first()
 		return None
+
+	def search(self,query):
+		lookups = (
+			Q(title__icontains=query) | Q(description__icontains=query)
+			|Q(tag__title__icontains=query))
+		#Q(tag__name__icontains=query)	
+		return self.get_queryset().filter(lookups).distinct()
 
 
 class Product(models.Model):

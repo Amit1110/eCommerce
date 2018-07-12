@@ -5,7 +5,7 @@ import os
 from django.urls import reverse
 # Create your models here.
 from django.db.models.signals import pre_save
-from .utils import unique_slug_generator
+from ecommerce.utils import unique_slug_generator
 
 
 def get_file_ext(filepath):

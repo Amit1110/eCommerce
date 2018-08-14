@@ -14,7 +14,7 @@ class CartManager(models.Manager):
 		qs = self.get_queryset().filter(id=cart_id)
 		if qs.count()==1:
 			new_obj = False
-			print('Cart ID exists')
+			#print('Cart ID exists')
 			cart_obj = qs.first()
 			if request.user.is_authenticated() and cart_obj.user is None:
 				cart_obj.user = request.user
@@ -36,7 +36,7 @@ class CartManager(models.Manager):
 class Cart(models.Model):
 	user       = models.ForeignKey(User,null=True,blank = True)
 	products   = models.ManyToManyField(Product,blank=True) 
-	subtotal      = models.DecimalField(default = 0.0,max_digits = 100,decimal_places=2)
+	subtotal   = models.DecimalField(default = 0.0,max_digits = 100,decimal_places=2)
 	total      = models.DecimalField(default = 0.0,max_digits = 100,decimal_places=2)
 	timestamp  = models.DateTimeField(auto_now_add=True)
 	updated    = models.DateTimeField(auto_now = True)

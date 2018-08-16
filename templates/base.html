@@ -21,5 +21,62 @@
 	  </div>
 	   
 	    {% include 'base/js.html' %}
+
+	    <script type="text/javascript">
+	    	$(document).ready(function()
+	    	{
+	    		var productForm = $(".form-product-ajax")
+	    		productForm.submit(function(event)
+	    		{
+	    			event.preventDefault();
+	    			//console.log("Form is not sent")
+	    			var thisform = $(this)
+	    			//var actionEnd = thisform.attr("action");
+	    			var actionEnd = thisform.attr("data-endpoint");// API EndPoint
+	    			var method = thisform.attr("method");
+	    			var formData = thisform.serialize();
+
+	    			//console.log(thisform.attr("action"), thisform.attr("method"), thisform.attr("action"))
+
+	    			$.ajax({
+	    				url: actionEnd,
+	    				method: method,
+	    				data: formData,
+	    				success: function(data){
+	    					// console.log("success")
+	    				 //    console.log(data)
+	    				 //    console.log("Added", data.added)
+	    				 //    console.log("Removed", data.removed)
+	    				    var submitSapn = thisform.find('.submit-span')
+	    				    if (data.added){
+	    				    	submitSapn.html("In cart <button type='submit' class='btn btn-link'>Remove?</button>")
+	    				    }
+	    				    else
+	    				    {
+	    				    	submitSapn.html("<button type='submit' class='btn btn-success'>Add to cart</button>")
+	    				    }
+	    				    var navbar = $(".navbar-cart-count")
+	    				    navbar.text(data.cartItemCount)
+
+	    				    var currentPath = window.location.href //checks for word in the path
+	    				    if (currentPath.indexOf("cart") != 1)
+	    				    {
+	    				    	updateCart()
+	    				    }
+	    				},
+	    				error: function(errorData){
+	    					console.log("error")
+	    					console.log(errorData)
+	    				}
+	    			})
+	    		})
+	    		function updateCart(){
+	    			console.log("in current cart")
+	    			var cartTable = $(".cart-table")
+	    			var cartBody = cartTable.find(".cart-body")
+	    			cartBody.html("<h1>Changed</h1>")
+	    		}
+	    	})
+	    </script>
 	  </body>
 	</html>

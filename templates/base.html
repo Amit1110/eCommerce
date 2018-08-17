@@ -25,6 +25,46 @@
 	    <script type="text/javascript">
 	    	$(document).ready(function()
 	    	{
+
+	    		// Auto Search
+
+	    		var searchForm = $(".search-form")
+	    		var searchInput = searchForm.find("[name='q']")
+	    		var searchBtn = searchForm.find("[type='submit']")
+	    		var typingTimer;
+	    		var typingInterval = 500 //1.5 seconds
+
+	    		searchInput.keyup(function(event){
+	    			clearTimeout(typingTimer)
+	    			typingTimer = setTimeout(performSearch,typingInterval)
+
+	    		})
+
+	    		searchInput.keydown(function(event){
+	    			clearTimeout(typingTimer)
+	    		})
+
+	    		function displaySearching()
+	    		{
+	    			searchBtn.addClass("disaabled")
+	    			searchBtn.html("<i class='fa fa-spin fa-spinner'></i>Searching...")
+	    		}
+
+	    		function performSearch()
+	    		{
+	    			//console.log(searchInput.val())
+	    			displaySearching()
+
+	    			query = searchInput.val()
+
+	    			setTimeout(function()
+	    			{
+	    				window.location.href = '/search/?q=' + query
+	    			},1000)
+	    			
+	    		}
+
+	    		//Ajax and Form
 	    		var productForm = $(".form-product-ajax")
 	    		productForm.submit(function(event)
 	    		{
@@ -88,8 +128,9 @@
 	    				method: refreshCartmethod,
 	    				data: data,
 	    				success: function(data){
-	    					console.log("success")
-	    					console.log(data)
+	    					 var hiddenCartItemRemoveForm = $(".cart-item-remove-form")
+
+
 	    					if(data.products.length > 0)
 	    					{
 	    						productRows.html(" ");
@@ -97,7 +138,14 @@
 	    						$.each(data.products, function(index,value)
 	    						{
 	    							console.log(value)
-	    							cartBody.prepend("<tr><th scope=\"row\">" + i + "</th><td><a href='" + value.url + "'>" + value.name + "</a></td><td>" + value.price + "</td></tr>")	
+
+	    							var newCartItemRemove = hiddenCartItemRemoveForm.clone()
+
+	    							newCartItemRemove.css("display","block")
+	    							//newCartItemRemove.removeClass("display","block")
+	    							newCartItemRemove.find(".cart-item-product-id").val(value.id)
+
+	    							cartBody.prepend("<tr><th scope=\"row\">" + i + "</th><td><a href='" + value.url + "'>" + value.name + "</a>" + newCartItemRemove.html() + "</td><td>" + value.price + "</td></tr>")	
 	    							i --
 	    						})
 

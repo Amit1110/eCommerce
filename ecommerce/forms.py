@@ -27,11 +27,14 @@ class ContactForm(forms.Form):
 			"placeholder":"your message"
 			}))
 
-	def clean_email(self):
-		email = self.cleaned_data.get("email")
-		if not "gmail.com" in email:
-			raise forms.ValidationError("email has to be gmail.com")
-		return email
+	# def clean_email(self):
+	# 	email = self.cleaned_data.get("email")
+	# 	if not "gmail.com" in email:
+	# 		raise forms.ValidationError("email has to be gmail.com")
+	# 	return email
+
+	# def clean_content(self):
+	# 	raise forms.ValidationError("Content is not helpful")
 
 
 

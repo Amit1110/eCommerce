@@ -25,6 +25,68 @@
 	    <script type="text/javascript">
 	    	$(document).ready(function()
 	    	{
+	    		//Contact Form Handler
+
+	    		var contactForm = $(".contact-form")
+	    		var contactFormMethod = contactForm.attr("method")
+	    		var contactFormEndpoint = contactForm.attr("action") 
+	    		
+
+	    		function displaySubmitting(submitBtn, defaultText, doSubmit)
+	    		{
+	    			if (doSubmit){
+	    				submitBtn.addClass("disaabled")
+	    				submitBtn.html("<i class='fa fa-spin fa-spinner'></i>Submitting...")	
+	    			}else{
+	    				submitBtn.removeClass("disaabled")
+	    				submitBtn.html(defaultText)	
+	    			}
+	    			
+	    		}
+
+	    		contactForm.submit(function(event){
+	    			event.preventDefault()
+	    			
+	    			var contactFormSubmitBtn = contactForm.find("[type='submit']")
+	    			var contactFormSubmitBtnTxt = contactFormSubmitBtn.text()
+
+	    			var formData = contactForm.serialize()
+	    			var thisForm = $(this)
+	    			displaySubmitting(contactFormSubmitBtn,"",true)
+	    			$.ajax(
+	    			{
+	    				url: contactFormEndpoint,
+	    				method: contactFormMethod,
+	    				data : formData,
+	    				success : function(data){
+	    					contactForm[0].reset()
+	    					$.alert({
+	    						title   : "Eureka!!",
+	    						content : data.message,
+	    						theme   : "modern"})
+	    					setTimeout(function(){
+	    						displaySubmitting(contactFormSubmitBtn,contactFormSubmitBtnTxt,false)
+	    						
+	    					},500)
+	    				},
+	    				error : function(error){
+	    					console.log(error.responseJSON)
+		                    var jsonData = error.responseJSON
+		                    var msg = ""
+		                    $.each(jsonData, function(key, value){ // key, value  array index / object
+		                      msg += key + ": " + value[0].message + "<br/>"
+		                    })
+	    					$.alert({
+	    						title   : "Sorry!!",
+	    						content : msg,
+	    						theme   : "modern"})
+	    					setTimeout(function(){
+	    						displaySubmitting(contactFormSubmitBtn,contactFormSubmitBtnTxt,false)
+	    						
+	    					},500)
+	    				}
+	    			})
+	    		})
 
 	    		// Auto Search
 
@@ -105,6 +167,10 @@
 	    				    }
 	    				},
 	    				error: function(errorData){
+	    					$.alert({
+	    						title : "Sorry!!",
+	    						content:"An error occured",
+	    						theme : "modern"})
 	    					console.log("error")
 	    					console.log(errorData)
 	    				}

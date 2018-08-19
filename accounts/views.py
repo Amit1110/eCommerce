@@ -60,16 +60,15 @@ def login_page(request):
 	return render(request,'accounts/login.html',context)
 
 User = get_user_model()
+
+
 def register_page(request):
 	form = RegisterForm(request.POST or None)
 	context = {
 	"form":form
 	}
 	if form.is_valid():
-		print(form.cleaned_data)
-		username = form.cleaned_data.get("username")
-		email = form.cleaned_data.get("email")
-		password = form.cleaned_data.get("password")
-		new_user = User.objects.create_user(username,email,password)
-		print(new_user)
+		form.save()
+
+	
 	return render(request,'accounts/register.html',context)

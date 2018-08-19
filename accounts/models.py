@@ -4,13 +4,16 @@ from django.contrib.auth.models import (
 )
 
 class UserManager(BaseUserManager):
-	def create_user(self,email,password=None, is_active = True, is_staff=False,is_admin=False):
+	def create_user(self,email,full_name=None,password=None, is_active = True, is_staff=False,is_admin=False):
 		if not email:
 			raise ValueError("Users must have an email address")
 		if not password:
 			raise ValueError("Users must have a password")
+		# if not full_name:
+		# 	raise ValueError("Users must have a Full Name")
 		user_obj =  self.model(
-			email = self.normalize_email(email)
+			email = self.normalize_email(email),
+			full_name = full_name
 		)
 		user_obj.staff = is_staff
 		user_obj.active = is_active
@@ -19,16 +22,18 @@ class UserManager(BaseUserManager):
 		user_obj.save(using=self._db)
 		return user_obj
 
-	def create_staffuser(self,email,password=None):
+	def create_staffuser(self,email,full_name=None,password=None):
 		user = self.create_user(
 			email,
+			full_name=full_name,
 			password = password,
 			is_staff=True
 		)
 		return user
-	def create_superuser(self,email,password=None):
+	def create_superuser(self,email,full_name=None,password=None):
 		user = self.create_user(
 			email,
+			full_name=full_name,
 			password = password,
 			is_staff=True,
 			is_admin = True
@@ -37,7 +42,7 @@ class UserManager(BaseUserManager):
 
 class User(AbstractBaseUser):
 	email = models.EmailField(max_length = 255,unique=True)
-	#full_name = models.CharField(max_length=255, blank = True, null=True)
+	full_name = models.CharField(max_length=255, blank = True, null=True)
 	active = models.BooleanField(default=True)#can login
 	staff = models.BooleanField(default=False)#staff user
 	admin = models.BooleanField(default=False)#superuser
@@ -51,10 +56,18 @@ class User(AbstractBaseUser):
 	def __Str__(self):
 		return self.email
 	def get_full_name(self):
+		if self.full_name:
+			return self.full_name
 		return self.email
 
 	def get_short_name(self):
 		return self.email
+
+	def has_perm(self,perm,obj=None):
+		return True
+
+	def has_module_perms(self,app_label):
+		return True
 
 	@property
 	def is_staff(self):

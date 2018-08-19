@@ -5,6 +5,7 @@ from .models import Product
 
 from .models import Product
 
+from analytics.mixins import ObjetcViewedMixin
 from carts.models import Cart
 
 
@@ -16,7 +17,7 @@ class ProductFeaturedListView(ListView):
 		return Product.objects.feature()
 
 
-class ProductFeaturedDetailView(DetailView):
+class ProductFeaturedDetailView(ObjetcViewedMixin,DetailView):
 	#queryset = Product.objects.all()
 	template_name = "products/featured-detail.html"
 
@@ -105,7 +106,7 @@ def productdetailview(request,pk = None,*args,**kwargs):
 	return render(request,"products/detail.html",context)
 
 
-class ProductDetailSlugView(DetailView):
+class ProductDetailSlugView(ObjetcViewedMixin,DetailView):
 	queryset = Product.objects.all()
 	template_name = "products/detail.html"
 
@@ -130,4 +131,5 @@ class ProductDetailSlugView(DetailView):
 		except:
 			raise Http404("Uhhhhmmm")
 
+		# object_viewed_signal.send(instance.__class__, instance=instance,request=request) #have to write again and again for different models
 		return instance

@@ -9,6 +9,9 @@ User = settings.AUTH_USER_MODEL
 # abc@gmail.com -> 10000 billing profiles
 # user abc@gmail.com -> 1 billing profile
 
+import stripe
+
+stripe.api_key = "sk_test_OBJ1L6pbEG137xczBIVLrp6n"
 
 class BillingProfileManger(models.Manager):
 	def new_or_get(self,request):
@@ -36,6 +39,7 @@ class BillingProfile(models.Model):
 	active = models.BooleanField(default=True)
 	update = models.DateTimeField(auto_now=True)
 	timestamp = models.DateTimeField(auto_now_add=True)
+	customer_id = models.CharField(max_length=120,null=True,blank=True)
 	#customer_id in stripe/BrainTree
 
 	def __str__(self):
@@ -43,11 +47,16 @@ class BillingProfile(models.Model):
 
 	objects = BillingProfileManger()
 
-# def billing_profile_created_receiver(sender,instance,created, *args,**kwargs):
-# 	if created:
-# 		print("Actual API call to Stripe/Braintree")
-# 		instance.customer_id = newID
-# 		instance.save()
+def billing_profile_created_receiver(sender,instance, *args,**kwargs):
+	if not instance.customer_id and instance.email:
+		print("Actual API call to Stripe")
+		customer = stripe.Customer.create(
+				email = instance.email
+			)
+		print(customer)
+		instance.customer_id = customer.id
+
+pre_save.connect(billing_profile_created_receiver,sender=BillingProfile)
 
 
 def user_created_receiver(sender,instance, created ,*args, **kwargs):

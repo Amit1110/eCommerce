@@ -1,11 +1,13 @@
 from django.shortcuts import render,get_object_or_404
 from django.views.generic import ListView,DetailView
 from django.http import Http404
-from .models import Product
+from analytics.mixins import ObjectViewedMixin
 
 from .models import Product
 
-from analytics.mixins import ObjetcViewedMixin
+from .models import Product
+
+
 from carts.models import Cart
 
 
@@ -17,7 +19,7 @@ class ProductFeaturedListView(ListView):
 		return Product.objects.feature()
 
 
-class ProductFeaturedDetailView(ObjetcViewedMixin,DetailView):
+class ProductFeaturedDetailView(ObjectViewedMixin,DetailView):
 	#queryset = Product.objects.all()
 	template_name = "products/featured-detail.html"
 
@@ -106,7 +108,7 @@ def productdetailview(request,pk = None,*args,**kwargs):
 	return render(request,"products/detail.html",context)
 
 
-class ProductDetailSlugView(ObjetcViewedMixin,DetailView):
+class ProductDetailSlugView(ObjectViewedMixin,DetailView):
 	queryset = Product.objects.all()
 	template_name = "products/detail.html"
 

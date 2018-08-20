@@ -56,7 +56,7 @@ def productlistview(request):
 	}
 	return render(request,"products/list.html",context)
 		
-class ProductDetailView(DetailView):
+class ProductDetailView(ObjectViewedMixin,DetailView):
 	#queryset = Product.objects.all()
 	template_name = "products/detail.html"
 

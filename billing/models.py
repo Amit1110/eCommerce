@@ -1,6 +1,7 @@
-from django.db import models
 from django.conf import settings
+from django.db import models
 from django.db.models.signals import pre_save,post_save
+from django.core.urlresolvers import reverse
 
 from accounts.models import GuestEmail
 
@@ -18,7 +19,7 @@ class BillingProfileManger(models.Manager):
 		user = request.user
 		guest_email_id = request.session.get('guest_email_id')
 
-		billing_profile = None
+		#billing_profile = None
 		created = False
 		obj = None
 		if user.is_authenticated():
@@ -42,10 +43,11 @@ class BillingProfile(models.Model):
 	customer_id = models.CharField(max_length=120,null=True,blank=True)
 	#customer_id in stripe/BrainTree
 
+	objects = BillingProfileManger()
+
 	def __str__(self):
 		return self.email
 
-	objects = BillingProfileManger()
 
 	def charge(self, order_obj, card=None):
 		return Charge.objects.do(self,order_obj, card)
@@ -54,14 +56,17 @@ class BillingProfile(models.Model):
 	def get_cards(self):
 		return self.card_set.all()
 
+	def get_payment_method_url(self):
+		return reverse("billing-payment-method")
+
 	@property
 	def has_card(self): #instance.has_card
-		card_qs = self.card_set.all()
+		card_qs = self.get_cards()
 		return card_qs.exists()
 
 	@property
 	def default_card(self):
-		default_cards = self.get_cards().filter(default=True)
+		default_cards = self.get_cards().filter(active=True, default=True)
 		if default_cards.exists():
 			return default_cards.first()
 		return None
@@ -129,6 +134,15 @@ class Card(models.Model):
 	def __str__(self):
 		return "{} {}".format(self.brand,self.last4)
 
+
+def new_card_post_save_receiver(sender, instance, created, *args, **kwargs):
+	if instance.default:
+		billing_profile = instance.billing_profile
+		qs = Card.objects.filter(billing_profile=billing_profile).exclude(pk=instance.pk)
+		qs.update(default=False)
+
+post_save.connect(new_card_post_save_receiver, sender=Card)
+
 class ChargeManager(models.Manager):
 	def do(self, billing_profile, order_obj, card=None):
 		card_obj = card
@@ -136,8 +150,8 @@ class ChargeManager(models.Manager):
 			cards = billing_profile.card_set.filter(default = True)
 			if cards.exists():
 				card_obj = cards.first()
-			if card_obj is None:
-				return False, "No cards available"
+		if card_obj is None:
+			return False, "No cards available"
 		c = stripe.Charge.create(
 			amount = int(order_obj.total*100),
 			currency = "usd",

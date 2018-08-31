@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'search',
     'tags',
     'carts',
+    'marketing',
     'orders',
     'accounts',
     'billing',
@@ -53,6 +54,11 @@ INSTALLED_APPS = [
 AUTH_USER_MODEL = 'accounts.User'
 FORCE_SESSION_TO_ONE = False
 FORCE_INACTIVE_USER_ENDSESSION = False
+
+
+MAILCHIMP_API_KEY           = "0279068b9ff5da0809e8f23014793e45-us19"
+MAILCHIMP_DATA_CENTER       = 'us19'
+MAILCHIMP_EMAIL_LIST_ID     = 'da04f47701'
 
 STRIPE_SECRET_KEY = "sk_test_OBJ1L6pbEG137xczBIVLrp6n"
 STRIPE_PUB_KEY = "pk_test_ThzzgkBGhdMHqFaMi093UcFe"
@@ -149,3 +155,8 @@ MEDIA_URL =  '/media/'
 
 
 MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), "static_cdn","media_root")
+
+'''
+pass - asdf1234
+all emails
+'''

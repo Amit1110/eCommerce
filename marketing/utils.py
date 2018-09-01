@@ -1,3 +1,5 @@
+import hashlib
+import re
 import json
 import requests
 from django.conf import settings
@@ -8,6 +10,20 @@ MAILCHIMP_API_KEY           = getattr(settings,"MAILCHIMP_API_KEY",None)
 MAILCHIMP_DATA_CENTER       = getattr(settings,'MAILCHIMP_DATA_CENTER',None)
 MAILCHIMP_EMAIL_LIST_ID     = getattr(settings,'MAILCHIMP_EMAIL_LIST_ID',None)
 
+
+# to check whether the email is valid or not
+def check_email(email):
+	if not re.match(r".+@.+\..+",email):
+		return ValueError("String passed is not a valid email address")
+	return email
+
+
+
+def get_subscriber_hash(member_email):
+	check_email(member_email)
+	member_email = member_email.lower().encode()
+	m = hashlib.md5(member_email)
+	return m.hexdigest()
 
 
 class MailChimp(object):
@@ -22,14 +38,31 @@ class MailChimp(object):
                         )
 
 
+	def get_members_endpoint(self):
+		return self.list_endpoint + '/members'
+
+	def change_subscription_status(self,email, status = 'unsubscribed'):
+		hashed_email = get_subscriber_hash(email)
+		#print(hashed_email)
+		endpoint = self.get_members_endpoint() + "/" + hashed_email  # hashed email is necessary as it is url
+		data = {
+			"status": self.check_valid_status(status)
+		}
+
+		r = requests.put(endpoint, auth=("", self.key), data = json.dumps(data))
+		return r.json()
+
+
 	def check_subscription_status(self,email):
 		# endpoint
 		# method
 		# data
 		# auth
-		endpoint = self.api_url
+		hashed_email = get_subscriber_hash(email)
+		print(hashed_email)
+		endpoint = self.get_members_endpoint() + "/" + hashed_email  # hashed email is necessary as it is url
 		r = requests.get(endpoint, auth=("", self.key))
-		return r.json
+		return r.json()
 
 	def check_valid_status(self, status):
 		choices = ['subscribed', 'unsubscribed', 'cleaned', 'pending']
@@ -38,16 +71,22 @@ class MailChimp(object):
 		return status
 
 	def add_email(self, email):
-		# endpoint
-		# method
-		# data
-		# auth
 		status = "subscribed"
 		self.check_valid_status(status)
 		data = {
 			"email_address" : email,
 			"status" : status
 		}
-		endpoint = self.list_endpoint + "/members"
+		endpoint = self.get_members_endpoint()
 		r = requests.post(endpoint, auth=("", self.key), data = json.dumps(data))
 		return r.json()
+
+	def unsubscribe(self, email):
+		return self.change_subscription_status(email, status='unsubscribed')
+
+	def subscribe(self, email):
+		return self.change_subscription_status(email, status='subscribed')
+
+	def pending(self, email):
+		return self.change_subscription_status(email, status='pending')
+

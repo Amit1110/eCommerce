@@ -16,6 +16,9 @@ class MarketingPreference(models.Model):
 		return self.user.email
 
 
+
+
+
 def marketing_pref_create_receiver(sender, instance, created, *args, **kwargs):
 	if created:
 		#print('Add user to mailchimp')

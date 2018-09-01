@@ -13,6 +13,8 @@ from .views import home_page,contact_page,about_page
 from addresses.views import checkout_address_create_view, checkout_address_reuse_view
 from carts.views import cart_detail_api_view
 from billing.views import payment_method_view,payment_method_createview
+from marketing.views import MarketingPreferenceUpdateView
+
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
@@ -29,7 +31,8 @@ urlpatterns = [
     url(r'^cart/', include("carts.urls",namespace = 'cart')),
     url(r'^register/$', RegisterView.as_view(),name='register'),
     url(r'^bootstrap/$', TemplateView.as_view(template_name = 'bootstrap/example.html')),
-    url(r'^search/', include("search.urls",namespace = 'search')),   
+    url(r'^search/', include("search.urls",namespace = 'search')), 
+    url(r'^settings/email/',MarketingPreferenceUpdateView.as_view(), name='marketing-pref'),   
     url(r'^billing/payment-method/create/',payment_method_createview,name='billing-payment-method-endpoint'),
     url(r'^billing/payment-method/',payment_method_view,name='billing-payment-method'),
 
